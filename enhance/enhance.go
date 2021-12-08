@@ -5,7 +5,6 @@ import (
 	"log"
 	"os"
 	"os/exec"
-	"sync"
 )
 
 // RunVideoEnhance - runs the veai.exe cmd.
@@ -13,8 +12,6 @@ func ExecEnhance(ipath, format, opath string) {
 
 	var file string
 
-	wg := new(sync.WaitGroup)
-	wg.Add(2)
 	// read the directory of the files (always dropbox veai)
 	fp, err := os.ReadDir(ipath)
 	if err != nil {
@@ -35,9 +32,10 @@ func ExecEnhance(ipath, format, opath string) {
 	fmt.Println(standinCmd)
 
 	// exec cmdString.
-	cmd := exec.Command(standinCmd)
+	cmd := exec.Command("VideoEnhanceAI", standinCmd)
+
 	if err = cmd.Run(); err != nil {
-		log.Fatal("could not run veai command", err.Error())
+		log.Fatal("could not run command\n", err.Error())
 	}
 
 	log.Println("running veai.")
