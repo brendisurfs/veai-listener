@@ -1,3 +1,15 @@
+/*
+TODO:
+somehow set up a pubsub system with the RunCmd only firing when the chan has "CREATE"
+createChan := make(chan string)
+
+if event.Op.String() == "CREATE" {
+	createChan <- "CREATE"
+}
+then run veai in a seperate thread to allow it to fully exec.
+
+
+**/
 package main
 
 import (
