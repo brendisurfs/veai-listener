@@ -5,10 +5,12 @@ import (
 	"log"
 	"os"
 	"os/exec"
+
+	"github.com/fsnotify/fsnotify"
 )
 
 // RunVideoEnhance - runs the veai.exe cmd.
-func ExecEnhance(ipath, format, opath string) {
+func execEnhance(ipath, format, opath string) (string, error) {
 
 	var file string
 
@@ -16,7 +18,7 @@ func ExecEnhance(ipath, format, opath string) {
 	fp, err := os.ReadDir(ipath)
 	if err != nil {
 		log.Println(err)
-		return
+		return "", err
 	}
 
 	// read dir for files, if the index is greater than zero, process index[1]
@@ -27,16 +29,26 @@ func ExecEnhance(ipath, format, opath string) {
 	}
 
 	// var cmdString string = fmt.Sprintf("veai.exe -i %s -f %s -o %s", file, format, opath)
-	var standinCmd string = fmt.Sprintf("VideoEnhanceAI -i %s -f %s -o %s", file, format, opath)
+	var standinCmd string = fmt.Sprintf("-i %s -f %s -o %s", file, format, opath+file)
 
-	fmt.Println(standinCmd)
+	return standinCmd, nil
 
-	// exec cmdString.
-	cmd := exec.Command("VideoEnhanceAI", standinCmd)
+}
 
-	if err = cmd.Run(); err != nil {
-		log.Fatal("could not run command\n", err.Error())
+func RunCmd(ipath, format, opath string, event fsnotify.Event) {
+
+	command, err := execEnhance(ipath, format, opath)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	log.Println("running veai.")
+	cmd := exec.Command("VideoEnhanceAI", command)
+
+	if err = cmd.Start(); err != nil {
+		log.Fatal("could not run command\n", err.Error())
+	}
+	cmd.Process.Wait()
+
+	log.Println("done running video enhance.")
+
 }

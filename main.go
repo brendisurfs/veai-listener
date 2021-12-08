@@ -52,10 +52,9 @@ func main() {
 				if !ok {
 					return
 				}
+				enhance.RunCmd(config.InDir, "mp4", config.OutDir, event)
+
 				// listen for the create, start doing the create stuff.
-				if event.Op.String() == "CREATE" {
-					enhance.ExecEnhance(config.InDir, "mp4", config.OutDir)
-				}
 
 			case err, ok := <-watcher.Errors:
 				if !ok {
